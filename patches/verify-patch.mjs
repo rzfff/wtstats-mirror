@@ -12,12 +12,17 @@ const checks = [
   ["bundle: 表格 layout=fitDataStretch(第15轮)", 'layout:"fitDataStretch"', "bundle"],
   ["bundle: 剩余宽度按比例分配(第17轮)", 'Math.floor(r*c.getWidth()/w)', "bundle"],
   ["html: Export按钮间距(第17轮)", '#selected-table-div > button { margin-top: 10px; }', "html"],
+  ["html: 右下角来源链接(第18轮)", '#wt-src-links { position: fixed; right: 10px; bottom: 5px;', "html"],
+  ["html: 来源链接指向上游(第18轮)", 'https://github.com/ControlNet/wt-data-project.web', "html"],
+  ["html: 来源链接指向本仓库(第18轮)", 'https://github.com/rzfff/wtstats-mirror', "html"],
   ["bundle: 趋势图图例国家汉化(第16轮)", '.text(d.Container.get(h.Localization.Nation)(t)).attr("text-anchor"', "bundle"],
   ["bundle: 无 controlnet.space 残留", null, "bundle-neg:controlnet.space"],
   ["bundle: 强制简中(主)", '(e="zh-CN",n=!0),l.select("html")', "bundle"],
   ["bundle: 强制简中(catch)", 'console.error(t),e="zh-CN"', "bundle"],
-  ["bundle: 表格列·载具名", '{title:"载具名",field:"ts_name"}', "bundle"],
-  ["bundle: 表格列·Wiki 名", '{title:"Wiki 名",field:"wk_name"}', "bundle"],
+  ["bundle: 表格列·载具名(含中文formatter,第19轮)", '{title:"载具名",field:"ts_name",formatter:function(t){var e=t.getValue(),z=window.__WT_NAMES_ZH__,r=z&&z[String(e).toLowerCase()]||e;return r!==e&&t.getElement().setAttribute("title",e),r}}', "bundle"],
+  ["bundle: 表格列·Wiki 名(含中文formatter,第19轮)", '{title:"Wiki 名",field:"wk_name",formatter:function(t){var e=t.getValue(),z=window.__WT_NAMES_ZH__,r=z&&z[String(e).toLowerCase()]||e;return r!==e&&t.getElement().setAttribute("title",e),r}}', "bundle"],
+  ["html: 中文名包已注入(第19轮)", "window.__WT_NAMES_ZH__={", "html"],
+  ["html: 中文名在 bundle 之前(第19轮)", null, "html-order:window.__WT_NAMES_ZH__=|dist/bundle.js?v="],
   ["bundle: 表格列·国家", '{title:"国家",field:"nation"', "bundle"],
   ["bundle: 表格列·类别", '{title:"类别",field:"class"', "bundle"],
   ["bundle: 表格列·分房", '{title:"分房",field:"br"', "bundle"],
@@ -73,6 +78,11 @@ for (const [name, pat, mode] of checks) {
   else if (mode === "html") ok = html.includes(pat);
   else if (mode?.startsWith("bundle-neg:")) ok = !new RegExp(mode.slice(12)).test(bundle);
   else if (mode?.startsWith("html-neg:")) ok = !new RegExp(mode.slice(9)).test(html);
+  else if (mode?.startsWith("html-order:")) { // "html-order:甲|乙" = 甲必须出现在乙之前(中文名包要先于 bundle 就位)
+    const [a, b] = mode.slice(11).split("|");
+    const ia = html.indexOf(a), ib = html.indexOf(b);
+    ok = ia > -1 && ib > -1 && ia < ib;
+  }
   if (!ok) bad++;
   console.log((ok ? "  OK  " : "MISS!") + " " + name);
 }

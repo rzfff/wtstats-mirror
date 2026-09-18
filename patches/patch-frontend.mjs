@@ -8,7 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "fs";
 
 // bundle 缓存版本号(全局唯一出处,verify-patch.mjs 会读走这个数自动对齐):
 // 改了任何 bundle 补丁 → V + 1 → 重跑;index.html 走 no-cache,改注入层可不递增
-const V = 12;
+const V = 13;
 
 mkdirSync("patched", { recursive: true });
 
@@ -44,6 +44,17 @@ const patches = [
   // ⑥ 表格列标题汉化(上游把原始字段名直接当标题显示;共 14 列,全在唯一一处 Tabulator 实例化里)
   ["表格列:载具名", '{title:"ts_name",field:"ts_name"}', '{title:"载具名",field:"ts_name"}'],
   ["表格列:Wiki 名", '{title:"wk_name",field:"wk_name"}', '{title:"Wiki 名",field:"wk_name"}'],
+  // ⑥-2 载具中文名(第 19 轮,/wtapi/ 管线落地):表格 ts_name/wk_name 两列的数据就是 identifier
+  //     (上游 selectColumns 里 ts_name:t.name、wk_name:t.wk_name,而 joined CSV 的 name 列=identifier),
+  //     formatter 查注入的 window.__WT_NAMES_ZH__(key=小写 identifier → datamine units.csv 官方简中,
+  //     由 ../wtapi-build/gen_names_zh.py 生成);查不到(事件车等)回落原值;底层数据不动(排序/CSV 导出仍按 identifier),
+  //     命中时 hover 的 title 提示显示原 identifier 便于核对
+  ["表格列:载具名中文 formatter(第19轮)",
+   '{title:"载具名",field:"ts_name"}',
+   '{title:"载具名",field:"ts_name",formatter:function(t){var e=t.getValue(),z=window.__WT_NAMES_ZH__,r=z&&z[String(e).toLowerCase()]||e;return r!==e&&t.getElement().setAttribute("title",e),r}}'],
+  ["表格列:Wiki名中文 formatter(第19轮)",
+   '{title:"Wiki 名",field:"wk_name"}',
+   '{title:"Wiki 名",field:"wk_name",formatter:function(t){var e=t.getValue(),z=window.__WT_NAMES_ZH__,r=z&&z[String(e).toLowerCase()]||e;return r!==e&&t.getElement().setAttribute("title",e),r}}'],
   ["表格列:国家", '{title:"nation",field:"nation"', '{title:"国家",field:"nation"'],
   ["表格列:类别", '{title:"class",field:"class"', '{title:"类别",field:"class"'],
   ["表格列:分房(含列宽)", '{title:"br",field:"br",maxWidth:50}', '{title:"分房",field:"br",maxWidth:72}'],
@@ -250,6 +261,11 @@ div#content {
   backdrop-filter: blur(4px); transition: background .15s;
 }
 #wt-data-btn:hover { background: rgba(255,255,255,.18); }
+/* 来源链接(第 18 轮,AGPL 出处+本仓库):右下角固定小字,半透明不扰,hover 提亮 */
+#wt-src-links { position: fixed; right: 10px; bottom: 5px; z-index: 290; font-size: 11px; opacity: .5; transition: opacity .15s; }
+#wt-src-links:hover { opacity: 1; }
+#wt-src-links a { color: var(--wt-sub); text-decoration: none; }
+#wt-src-links a:hover { color: var(--wt-accent); text-decoration: underline; }
 /* 全量切换确认弹窗(第 12 轮,替代浏览器原生 confirm;跟主题变量走,暗亮自适应) */
 #wt-dialog-mask { position: fixed; inset: 0; z-index: 99998; background: rgba(10,12,16,.45);
   display: flex; align-items: center; justify-content: center; }
@@ -341,10 +357,32 @@ html = html.replace(`<script src="dist/bundle.js?v=${V}"></script>`, `<div id="w
     });
   };
   document.body.appendChild(db);
+  // 来源链接(第 18 轮):右下角「原项目 · 本站源码」——AGPL 出处与镜像仓库(备份兼源码要约)
+  var sl=document.createElement('div');sl.id='wt-src-links';
+  sl.innerHTML='<a href="https://github.com/ControlNet/wt-data-project.web" target="_blank" rel="noopener noreferrer">原项目</a> · <a href="https://github.com/rzfff/wtstats-mirror" target="_blank" rel="noopener noreferrer">本站源码</a>';
+  document.body.appendChild(sl);
   if(fm==='full'){var lh=document.getElementById('wt-load-hint');if(lh){lh.textContent='全量数据模式:数据量较大,首次加载约需 1 分钟,请耐心等待;完成后进缓存,下次就快了'}}
 })();
 </script>
 <script src="dist/bundle.js?v=${V}"></script>`);
+// 载具中文名包(第 19 轮):datamine units.csv → ../wtapi-build/names-zh-by-id.json(gen_names_zh.py 生成);
+// 内联注入在 bundle 之前 —— 表格 formatter 渲染时 window.__WT_NAMES_ZH__ 必已就位,无异步竞态。
+// 更新流程:datamine 换版 → 跑 gen_names_zh.py → 重跑本脚本 → 只传 index.html(注入层 no-cache,无需 ?v 递增)
+let namesZh = "";
+try {
+  namesZh = readFileSync("../wtapi-build/names-zh-by-id.json", "utf8").trim();
+  if (namesZh.includes("</script")) throw new Error("names JSON 含 </script 序列,拒绝内联注入");
+} catch (e) {
+  if (String(e.message).includes("ENOENT")) {
+    console.error("警告:../wtapi-build/names-zh-by-id.json 不存在,本次产物无中文名(表格回落英文原名)");
+    namesZh = "";
+  } else throw e;
+}
+if (namesZh) {
+  const anchor = `<script src="dist/bundle.js?v=${V}"></script>`;
+  if (!html.includes(anchor)) throw new Error("中文名注入锚点失配(bundle script 标签)");
+  html = html.replace(anchor, `<script>window.__WT_NAMES_ZH__=${namesZh}</script>\n${anchor}`);
+}
 // gtag(Google Analytics)整段 + Cloudflare Web Analytics 整段(两个注释标记之间一并移除)
 html = html.replace(/\s*<!-- Global site tag[\s\S]*?End Cloudflare Web Analytics -->/, "");
 // getloli 计数图(默认 display:none,中文浏览器会被 JS 设为可见;bundle 对空选择集是安全空操作,可删)

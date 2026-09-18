@@ -8,13 +8,14 @@
 
 上游 `web` 分支为 CI 构建好的免构建成品,本镜像在其基础上做了以下修改
 (依 AGPL-3.0 在此提供对应修改说明;**补丁全量清单与逐条 from/to 对照**见运维方交接文档
-`wtstats-deploy-plan/patch-frontend.mjs` 与其生成的 `patch-table.json`,2026-09-18 版共 26 条 bundle 补丁):
+`wtstats-deploy-plan/patch-frontend.mjs` 与其生成的 `patch-table.json`,2026-09-19 版共 28 条 bundle 补丁):
 
-1. `dist/bundle.js`(26 处字符串替换,除注明外均不改变程序结构):
+1. `dist/bundle.js`(28 处字符串替换,除注明外均不改变程序结构):
    - 数据源 `https://controlnet.space/wt-data-project.data` → 运行时 getter:默认 `/wtstats/data`(精简数据),页面设置 `window.__WT_DATA_URL__` 后切换到 `/wtstats/data/full`(全量数据,配合首页「全部数据」按钮)
    - 「待定计划」页签读取的 `https://wt.controlnet.space/README.md` → `/wtstats/README.md`(本地化,消除外部运行时依赖)
    - 语言判断改为强制简体中文(上游只认 `navigator.language` 恰好为 `zh-CN`/`zh`)
    - 表格 14 个列标题与国家/高级/类别列的取值汉化(如 `ts_name`→`载具名`、`True`→`是`)
+   - 表格「载具名」与「Wiki 名」两列加 formatter:按行数据 identifier 查 `window.__WT_NAMES_ZH__` 显示官方简体中文名(数据源=gszabi99/War-Thunder-Datamine 的 units.csv,随姊妹服务 /wtapi/ 管线生成;查不到回落原值,hover 提示显示原 identifier;底层数据与排序/导出不变)
    - 分房/研发/银狮列宽调整(适配中文列名)
    - 导航栏 logo `/img/logo64.png` → `img/logo-wt.svg`(War Thunder 官网页头导航同款 SVG,商标归 Gaijin,仅作游戏识别性使用)
    - 「高级」列金色背景单元格文字改深棕色以保证暗色主题下可读
@@ -25,6 +26,7 @@
    - favicon `/img/logo.ico` → `img/favicon.ico`(War Thunder 官网 favicon)
    - 移除 Google Analytics(gtag)、Cloudflare Web Analytics、getloli 访问计数图
    - 注入 CSS/JS 定制层:暗/亮双主题(可切换)、横排筛选栏、加载遮罩(覆盖 ranks 与 joined 请求)、隐藏 6 个无用导航项、tooltip 文字配色、「全部数据」按钮(在未裁剪全量与精简数据间切换,切换前有加载时长确认提示;进页面一律精简模式,全量仅在当次标签页内生效)、全量模式引导脚本
+   - 在 bundle 之前内联注入 `window.__WT_NAMES_ZH__`(identifier→简体中文名映射表,约 4000 条,来源同上;中文名数据 © Gaijin Localization)
    - `bundle.js` 引用加 `?v=N` 缓存版本号
 3. 数据目录 `data/`:上游数据仓的镜像,由同步脚本自动裁剪(**精简默认:近 90 天全保留 + 更早每月 1 号采样**;`data/full/` 子目录为未裁剪全量副本——9 个原始 ranks + 原始 metadata,joined/ 与精简版硬链接共享)
 4. 删除 `CNAME`、`.github/`(GitHub Pages 专用文件);`README.md`、`LICENSE` 原样保留;新增本文件

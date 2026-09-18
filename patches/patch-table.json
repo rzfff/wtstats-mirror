@@ -35,6 +35,16 @@
   "to": "{title:\"Wiki 名\",field:\"wk_name\"}"
  },
  {
+  "name": "表格列:载具名中文 formatter(第19轮)",
+  "from": "{title:\"载具名\",field:\"ts_name\"}",
+  "to": "{title:\"载具名\",field:\"ts_name\",formatter:function(t){var e=t.getValue(),z=window.__WT_NAMES_ZH__,r=z&&z[String(e).toLowerCase()]||e;return r!==e&&t.getElement().setAttribute(\"title\",e),r}}"
+ },
+ {
+  "name": "表格列:Wiki名中文 formatter(第19轮)",
+  "from": "{title:\"Wiki 名\",field:\"wk_name\"}",
+  "to": "{title:\"Wiki 名\",field:\"wk_name\",formatter:function(t){var e=t.getValue(),z=window.__WT_NAMES_ZH__,r=z&&z[String(e).toLowerCase()]||e;return r!==e&&t.getElement().setAttribute(\"title\",e),r}}"
+ },
+ {
   "name": "表格列:国家",
   "from": "{title:\"nation\",field:\"nation\"",
   "to": "{title:\"国家\",field:\"nation\""
