@@ -261,8 +261,8 @@ div#content {
   backdrop-filter: blur(4px); transition: background .15s;
 }
 #wt-data-btn:hover { background: rgba(255,255,255,.18); }
-/* 来源链接(第 18 轮,AGPL 出处+本仓库):右下角固定小字,半透明不扰,hover 提亮 */
-#wt-src-links { position: fixed; right: 10px; bottom: 5px; z-index: 290; font-size: 11px; opacity: .5; transition: opacity .15s; }
+/* 来源链接(第 18 轮加,第 20 轮改):页面底部右侧小字(随文档流沉底,不再 fixed 跟随视窗) */
+#wt-src-links { margin: 22px 8px 6px 0; text-align: right; font-size: 11px; opacity: .6; }
 #wt-src-links:hover { opacity: 1; }
 #wt-src-links a { color: var(--wt-sub); text-decoration: none; }
 #wt-src-links a:hover { color: var(--wt-accent); text-decoration: underline; }
@@ -357,10 +357,13 @@ html = html.replace(`<script src="dist/bundle.js?v=${V}"></script>`, `<div id="w
     });
   };
   document.body.appendChild(db);
-  // 来源链接(第 18 轮):右下角「原项目 · 本站源码」——AGPL 出处与镜像仓库(备份兼源码要约)
+  // 来源链接(第 18 轮加,第 20 轮改版):页面底部右下「Upstream · Source · License」英文小字——
+  // AGPL 自托管实例通行写法(SearXNG/Invidious 页脚均 Source/License 英文链接):
+  // Upstream=上游原作者仓库;Source=本站运行代码的源码要约(镜像仓库);License=AGPL 原文(站内文件,同页签);
+  // 第 20 轮:fixed 视窗角标 → 随文档流沉底(append 进 #main-div 末尾,滚到页面底才见)
   var sl=document.createElement('div');sl.id='wt-src-links';
-  sl.innerHTML='<a href="https://github.com/ControlNet/wt-data-project.web" target="_blank" rel="noopener noreferrer">原项目</a> · <a href="https://github.com/rzfff/wtstats-mirror" target="_blank" rel="noopener noreferrer">本站源码</a>';
-  document.body.appendChild(sl);
+  sl.innerHTML='<a href="https://github.com/ControlNet/wt-data-project.web" target="_blank" rel="noopener noreferrer">Upstream</a> · <a href="https://github.com/rzfff/wtstats-mirror" target="_blank" rel="noopener noreferrer">Source</a> · <a href="/wtstats/LICENSE">License</a>';
+  (document.getElementById('main-div')||document.body).appendChild(sl);
   if(fm==='full'){var lh=document.getElementById('wt-load-hint');if(lh){lh.textContent='全量数据模式:数据量较大,首次加载约需 1 分钟,请耐心等待;完成后进缓存,下次就快了'}}
 })();
 </script>

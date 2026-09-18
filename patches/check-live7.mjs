@@ -41,7 +41,9 @@ const htmlChecks = [
   ["全量模式引导脚本", "window.__WT_DATA_URL__='/wtstats/data/full'"],
   ["全量数据按钮", "wt-data-btn"],
   ["遮罩覆盖 joined", "indexOf('/joined/')>-1"],
-  ["右下角来源链接(第18轮)", "wt-src-links"],
+  ["底部来源链接(第18/20轮)", "wt-src-links"],
+  ["来源链接英文(第20轮)", ">Upstream</a>"],
+  ["来源链接沉底新版 CSS(第20轮)", "#wt-src-links { margin: 22px 8px 6px 0; text-align: right;"],
 ];
 for (const [n, p] of htmlChecks) {
   if (p === null) {
