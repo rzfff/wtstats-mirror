@@ -1,0 +1,132 @@
+[
+ {
+  "name": "数据源域名→本站同源路径(getter 可切换)",
+  "from": "e.dataUrl=\"https://controlnet.space/wt-data-project.data\"",
+  "to": "Object.defineProperty(e,\"dataUrl\",{get:function(){return window.__WT_DATA_URL__||\"/wtstats/data\"}})"
+ },
+ {
+  "name": "待定计划页签 README→本地",
+  "from": "s.text(\"https://wt.controlnet.space/README.md\"",
+  "to": "s.text(\"/wtstats/README.md\""
+ },
+ {
+  "name": "导航 logo→官网导航版 SVG",
+  "from": "image=\"/img/logo64.png\"",
+  "to": "image=\"img/logo-wt.svg\""
+ },
+ {
+  "name": "语言判断→强制简中(主)",
+  "from": "\"zh-CN\"===navigator.language||\"zh\"===navigator.language?(e=\"zh-CN\",n=!0):e=\"en-US\"",
+  "to": "(e=\"zh-CN\",n=!0)"
+ },
+ {
+  "name": "语言判断→强制简中(catch 分支)",
+  "from": "console.error(t),e=\"en-US\"}return[4,fetch(\"config/i18n/",
+  "to": "console.error(t),e=\"zh-CN\"}return[4,fetch(\"config/i18n/"
+ },
+ {
+  "name": "表格列:载具名",
+  "from": "{title:\"ts_name\",field:\"ts_name\"}",
+  "to": "{title:\"载具名\",field:\"ts_name\"}"
+ },
+ {
+  "name": "表格列:Wiki 名",
+  "from": "{title:\"wk_name\",field:\"wk_name\"}",
+  "to": "{title:\"Wiki 名\",field:\"wk_name\"}"
+ },
+ {
+  "name": "表格列:国家",
+  "from": "{title:\"nation\",field:\"nation\"",
+  "to": "{title:\"国家\",field:\"nation\""
+ },
+ {
+  "name": "表格列:类别",
+  "from": "{title:\"class\",field:\"class\"",
+  "to": "{title:\"类别\",field:\"class\""
+ },
+ {
+  "name": "表格列:分房(含列宽)",
+  "from": "{title:\"br\",field:\"br\",maxWidth:50}",
+  "to": "{title:\"分房\",field:\"br\",maxWidth:72}"
+ },
+ {
+  "name": "表格列:场次",
+  "from": "{title:\"battles\",field:\"battles\"",
+  "to": "{title:\"场次\",field:\"battles\""
+ },
+ {
+  "name": "表格列:胜率",
+  "from": "{title:\"win_rate\",field:\"win_rate\"",
+  "to": "{title:\"胜率\",field:\"win_rate\""
+ },
+ {
+  "name": "表格列:空击杀/场",
+  "from": "{title:\"air_frags_per_battle\",field:\"air_frags_per_battle\"}",
+  "to": "{title:\"空击杀/场\",field:\"air_frags_per_battle\"}"
+ },
+ {
+  "name": "表格列:空击杀/亡",
+  "from": "{title:\"air_frags_per_death\",field:\"air_frags_per_death\"}",
+  "to": "{title:\"空击杀/亡\",field:\"air_frags_per_death\"}"
+ },
+ {
+  "name": "表格列:地击杀/场",
+  "from": "{title:\"ground_frags_per_battle\",field:\"ground_frags_per_battle\"}",
+  "to": "{title:\"地击杀/场\",field:\"ground_frags_per_battle\"}"
+ },
+ {
+  "name": "表格列:地击杀/亡",
+  "from": "{title:\"ground_frags_per_death\",field:\"ground_frags_per_death\"}",
+  "to": "{title:\"地击杀/亡\",field:\"ground_frags_per_death\"}"
+ },
+ {
+  "name": "表格列:高级",
+  "from": "{title:\"premium\",field:\"is_premium\"",
+  "to": "{title:\"高级\",field:\"is_premium\""
+ },
+ {
+  "name": "表格列:研发/场(摘列宽帽)",
+  "from": "{title:\"rp_rate\",field:\"rp_rate\",maxWidth:84}",
+  "to": "{title:\"研发/场\",field:\"rp_rate\"}"
+ },
+ {
+  "name": "表格列:银狮/场(摘列宽帽)",
+  "from": "{title:\"sl_rate\",field:\"sl_rate\",maxWidth:80}",
+  "to": "{title:\"银狮/场\",field:\"sl_rate\"}"
+ },
+ {
+  "name": "表格值:国家名",
+  "from": "i=p.nationColors.get(e);return n.style.backgroundColor=i,n.style.color=p.utils.genTextColorFromBgColor(i),e}",
+  "to": "i=p.nationColors.get(e);return n.style.backgroundColor=i,n.style.color=p.utils.genTextColorFromBgColor(i),{Germany:\"德国\",USA:\"美国\",USSR:\"苏联\",Britain:\"英国\",Japan:\"日本\",France:\"法国\",Italy:\"意大利\",China:\"中国\",Sweden:\"瑞典\",Israel:\"以色列\"}[e]||e}"
+ },
+ {
+  "name": "表格值:是/否",
+  "from": "return\"True\"===e&&(t.getElement().style.backgroundColor=p.COLORS.YELLOW),e}",
+  "to": "return\"True\"===e&&(t.getElement().style.backgroundColor=p.COLORS.YELLOW,t.getElement().style.color=\"#4a3b00\"),\"True\"===e?\"是\":\"否\"}"
+ },
+ {
+  "name": "表格值:类别",
+  "from": "nation:t.nation,class:t.cls,br:n.br",
+  "to": "nation:t.nation,class:({Ground_vehicles:\"地面\",Aviation:\"空中\"})[t.cls]||t.cls,br:n.br"
+ },
+ {
+  "name": "表格 layout→fitDataStretch(铺满+拖拽可保持)",
+  "from": "layout:\"fitColumns\"",
+  "to": "layout:\"fitDataStretch\""
+ },
+ {
+  "name": "总体趋势图图例国家名汉化",
+  "from": ".attr(\"y\",e-15-30*n).text(t).attr(\"text-anchor\",\"start\")",
+  "to": ".attr(\"y\",e-15-30*n).text(d.Container.get(h.Localization.Nation)(t)).attr(\"text-anchor\",\"start\")"
+ },
+ {
+  "name": "表格剩余宽度按比例分配(替代末列独占/平分)",
+  "from": "fitDataStretch:function(t,e){var n=0,i=this.table.rowManager.element.clientWidth,r=0,o=!1;t.forEach(((t,e)=>{t.widthFixed||t.reinitializeWidth(),(this.table.options.responsiveLayout?t.modules.responsive.visible:t.visible)&&(o=t),t.visible&&(n+=t.getWidth())})),o?(r=i-n+o.getWidth(),this.table.options.responsiveLayout&&this.table.modExists(\"responsiveLayout\",!0)&&(o.setWidth(0),this.table.modules.responsiveLayout.update()),r>0?o.setWidth(r):o.reinitializeWidth()):this.table.options.responsiveLayout&&this.table.modExists(\"responsiveLayout\",!0)&&this.table.modules.responsiveLayout.update()}",
+  "to": "fitDataStretch:function(t,e){var n=0,i=this.table.rowManager.element.clientWidth,r=0,o=!1,s,w;t.forEach(((t,e)=>{t.widthFixed||t.reinitializeWidth(),(this.table.options.responsiveLayout?t.modules.responsive.visible:t.visible)&&(o=t),t.visible&&(n+=t.getWidth())})),o?(r=i-n,this.table.options.responsiveLayout&&this.table.modExists(\"responsiveLayout\",!0)&&(o.setWidth(0),this.table.modules.responsiveLayout.update()),r>0?(s=t.filter(function(c){return c.visible&&!c.maxWidth}),w=0,s.forEach(function(c){w+=c.getWidth()}),w>0&&s.forEach(function(c){c.setWidth(c.getWidth()+Math.floor(r*c.getWidth()/w))})):o.reinitializeWidth()):this.table.options.responsiveLayout&&this.table.modExists(\"responsiveLayout\",!0)&&this.table.modules.responsiveLayout.update()}"
+ },
+ {
+  "name": "折线图 tooltip 加日期行",
+  "from": "[4,this.tooltip.update(this.selected.map((function(t){var e;return\"\".concat(p.Container.get(f.Localization.Nation)(t.nation),\" \")+\"\".concat(t.br,\": \").concat(u.round(null===(e=t.values.find((function(t){return t.date.getTime()===i.selectedDate})))||void 0===e?void 0:e.value,3))})),t)]",
+  "to": "[4,this.tooltip.update([\"日期: \"+l.timeFormat(\"%Y/%m/%d\")(new Date(i.selectedDate))].concat(this.selected.map((function(t){var e;return\"\".concat(p.Container.get(f.Localization.Nation)(t.nation),\" \")+\"\".concat(t.br,\": \").concat(u.round(null===(e=t.values.find((function(t){return t.date.getTime()===i.selectedDate})))||void 0===e?void 0:e.value,3))}))),t)]"
+ }
+]
