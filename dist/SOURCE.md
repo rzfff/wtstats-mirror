@@ -29,6 +29,10 @@
 3. 数据目录 `data/`:上游数据仓的镜像,由同步脚本自动裁剪(**精简默认:近 90 天全保留 + 更早每月 1 号采样**;`data/full/` 子目录为未裁剪全量副本——9 个原始 ranks + 原始 metadata,joined/ 与精简版硬链接共享)
 4. 删除 `CNAME`、`.github/`(GitHub Pages 专用文件);`README.md`、`LICENSE` 原样保留;新增本文件
 
+## 源码
+
+本镜像的完整源码、补丁集与部署工具链公开于:<https://github.com/rzfff/wtstats-mirror>
+
 ## 许可
 
 - 前端与数据均以 **AGPL-3.0** 许可,全文见 [`./LICENSE`](./LICENSE),© ControlNet 及贡献者
