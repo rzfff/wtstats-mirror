@@ -382,6 +382,18 @@ try {
   } else throw e;
 }
 if (namesZh) {
+  // v4.8:names-zh 值里游戏"缴获载具"前缀块字符(U+2580-259F,254 条)在此剥除——表格显示干净中文名。
+  // 注意:/wtrp/ 依赖 wtapi 的 names-zh.json 原样值检测 captured 标记,故只在本注入层剥除,不改 wtapi 产物。
+  const nz = JSON.parse(namesZh);
+  let stripped = 0;
+  for (const k of Object.keys(nz)) {
+    const v = nz[k];
+    if (typeof v === "string" && /[▀-▟]/.test(v)) { nz[k] = v.replace(/[▀-▟]/g, ""); stripped++; }
+  }
+  if (stripped) console.log(`names-zh 剥除缴获标记块字符 ${stripped} 条`);
+  namesZh = JSON.stringify(nz);
+}
+if (namesZh) {
   const anchor = `<script src="dist/bundle.js?v=${V}"></script>`;
   if (!html.includes(anchor)) throw new Error("中文名注入锚点失配(bundle script 标签)");
   html = html.replace(anchor, `<script>window.__WT_NAMES_ZH__=${namesZh}</script>\n${anchor}`);
