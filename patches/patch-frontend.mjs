@@ -127,6 +127,10 @@ html = html.replace('<script src="dist/bundle.js"></script>', `<script src="dist
 // 隐藏无用导航项(站长裁定):待定计划/GitHub源码/数据/反馈/论坛NEW/作者 —— 纯 CSS,不动 JS
 html = html.replace("</head>", `<style>
 /* ===== 镜像定制层 ===== */
+/* 0) 游戏符号字体(v5.3 第 22 轮,与 /wtrp/ 同款):载具名里的缴获标记前缀字符(▀␗◔◄等 515 条)
+   由 WTSymbols 渲染成无色文字级图标(与游戏一致);数字/中文不在字体覆盖内自动回退 */
+@font-face{font-family:WTSymbols;src:url(fonts/symbols_skyquake.ttf);font-display:swap}
+.tabulator .tabulator-cell{font-family:WTSymbols,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 /* 1) 隐藏无用的导航项 */
 #navbar li:has(> a#todo-list), #navbar li:has(> a#web-repo), #navbar li:has(> a#data-repo),
 #navbar li:has(> a#issues), #navbar li:has(> a#forum), #navbar li:has(> a#github) { display: none !important; }
@@ -382,16 +386,10 @@ try {
   } else throw e;
 }
 if (namesZh) {
-  // v4.8:names-zh 值里游戏"缴获载具"前缀块字符(U+2580-259F,254 条)在此剥除——表格显示干净中文名。
-  // 注意:/wtrp/ 依赖 wtapi 的 names-zh.json 原样值检测 captured 标记,故只在本注入层剥除,不改 wtapi 产物。
-  const nz = JSON.parse(namesZh);
-  let stripped = 0;
-  for (const k of Object.keys(nz)) {
-    const v = nz[k];
-    if (typeof v === "string" && /[▀-▟]/.test(v)) { nz[k] = v.replace(/[▀-▟]/g, ""); stripped++; }
-  }
-  if (stripped) console.log(`names-zh 剥除缴获标记块字符 ${stripped} 条`);
-  namesZh = JSON.stringify(nz);
+  // v5.3(wtrp 同款方案):names-zh 值**原样保留**游戏缴获标记前缀字符(块字符+␗◔◄等,共 515 条),
+  // 由下方注入的 WTSymbols 游戏符号字体渲染成无色文字级图标(与游戏一致);
+  // v4.8 的「注入层剥除块字符」方案废止(只覆盖 254/515,␗◔◄ 等仍漏成豆腐块)。
+  // 注意:wtapi 的 names-zh.json 永远保持原样(wtrp 依赖其前缀字符),本层只管显示。
 }
 if (namesZh) {
   const anchor = `<script src="dist/bundle.js?v=${V}"></script>`;

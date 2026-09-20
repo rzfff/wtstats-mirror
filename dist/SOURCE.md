@@ -27,7 +27,7 @@
    - 移除 Google Analytics(gtag)、Cloudflare Web Analytics、getloli 访问计数图
    - 注入 CSS/JS 定制层:暗/亮双主题(可切换)、横排筛选栏、加载遮罩(覆盖 ranks 与 joined 请求)、隐藏 6 个无用导航项、tooltip 文字配色、「全部数据」按钮(在未裁剪全量与精简数据间切换,切换前有加载时长确认提示;进页面一律精简模式,全量仅在当次标签页内生效)、全量模式引导脚本
    - 页面底部右侧「Upstream · Source · License」英文小字链接(随文档流沉底,不跟随视窗):Upstream=上游仓库、Source=本镜像源码、License=AGPL 原文(站内 `./LICENSE`)
-   - 在 bundle 之前内联注入 `window.__WT_NAMES_ZH__`(identifier→简体中文名映射表,约 4000 条,来源同上;中文名数据 © Gaijin Localization;值中游戏「缴获/外国载具」名前缀块字符 U+2580-259F 共 254 条在注入层剥除以便表格显示净名——未剥的原始版本由姊妹服务 /wtapi/ 提供,研发点计算器 /wtrp/ 依赖其识别缴获标记)
+   - 在 bundle 之前内联注入 `window.__WT_NAMES_ZH__`(identifier→简体中文名映射表,约 4000 条,来源同上;中文名数据 © Gaijin Localization;值中游戏「缴获/外国载具」名前缀标记字符(块字符+␗◔◄等,共 525 条)原样保留,并注入游戏符号字体 WTSymbols(symbols_skyquake.ttf,源自 War Thunder 客户端符号字体,同 blind-thunder.wiki 做法)将其渲染为无色文字级图标;字体版权归 Gaijin Entertainment)
    - `bundle.js` 引用加 `?v=N` 缓存版本号
 3. 数据目录 `data/`:上游数据仓的镜像,由同步脚本自动裁剪(**精简默认:近 90 天全保留 + 更早每月 1 号采样**;`data/full/` 子目录为未裁剪全量副本——9 个原始 ranks + 原始 metadata,joined/ 与精简版硬链接共享)
 4. 删除 `CNAME`、`.github/`(GitHub Pages 专用文件);`README.md`、`LICENSE` 原样保留;新增本文件
