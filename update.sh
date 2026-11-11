@@ -106,6 +106,7 @@ PYEOF
 #      3 个 _all 与 metadata 用拷贝 —— 它们不参与裁剪,若硬链接会让 gzip 拒压根目录副本
 #      ("has 1 other link -- file ignored",2026-09-18 上午日志里的警告即同类问题);
 #      joined/ 整目录硬链接放在第 7 步压缩之后(新拉文件若带 2 链接同样会被 gzip 跳过)。
+rm -rf "$STG/full"
 mkdir -p "$STG/full"
 for m in ab rb sb; do for r in 0 1; do ln "$STG/${m}_ranks_${r}.csv" "$STG/full/${m}_ranks_${r}.csv"; done; done
 for m in ab rb sb; do cp "$STG/${m}_ranks_all.csv" "$STG/full/${m}_ranks_all.csv"; done
@@ -155,7 +156,7 @@ find "$STG" -type f \( -name '*.csv' -o -name '*.json' \) ! -name '*.gz' ! -name
 while IFS= read -r -d '' f; do
     if [ ! -f "$f.gz" ] || [ "$f" -nt "$f.gz" ]; then rm -f "$f.gz"; gzip -k -9 "$f"; fi
     if command -v brotli >/dev/null 2>&1; then
-        if [ ! -f "$f.br" ] || [ "$f" -nt "$f.br" ]; then rm -f "$f.br"; brotli -q 10 -k "$f"; fi
+        if [ ! -f "$f.br" ] || [ "$f" -nt "$f.br" ]; then rm -f "$f.br"; brotli -q 5 -k "$f"; fi
     fi
 done
 echo "预压缩完成:$(find "$STG" -name '*.gz' | wc -l) 个 .gz / $(find "$STG" -name '*.br' | wc -l) 个 .br"
