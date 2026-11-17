@@ -47,7 +47,7 @@ fi
 # 2) 拉【原始】metadata.json;与上次原始版逐字节相同 → 无更新,秒退
 #    (rm 先断开硬链接再下载——curl -o 会原地覆写共享 inode,污染旧版本目录,2026-09-18 踩坑)
 rm -f "$STG/metadata.json"
-curl -fsSL --compressed --retry 3 --retry-delay 5 -o "$STG/metadata.json" "$SRC/metadata.json"
+curl -fsSL --compressed --retry 3 --retry-delay 5 --retry-all-errors -o "$STG/metadata.json" "$SRC/metadata.json"
 if [ -f "$RAWMETA" ] && cmp -s "$STG/metadata.json" "$RAWMETA"; then
     echo "无更新"
     exit 0
@@ -68,7 +68,7 @@ PYEOF
 for m in ab rb sb; do
     for r in 0 1 all; do
         rm -f "$STG/${m}_ranks_${r}.csv"   # 断开硬链接再下载,防原地覆写污染旧版本
-        curl -fsSL --compressed --retry 3 --retry-delay 5 \
+        curl -fsSL --compressed --retry 3 --retry-delay 5 --retry-all-errors \
              -o "$STG/${m}_ranks_${r}.csv" "$SRC/${m}_ranks_${r}.csv"
         sz=$(stat -c%s "$STG/${m}_ranks_${r}.csv")
         if [ "$sz" -le 500000 ]; then
@@ -166,7 +166,7 @@ echo "预压缩完成:$(find "$STG" -name '*.gz' | wc -l) 个 .gz / $(find "$STG
 cp -al "$STG/joined" "$STG/full/joined"
 
 # 8) 记录原始 metadata(供下轮比对;放最后写,失败中断则不会误记"已处理")+ 原子换版 + 只留 2 版
-curl -fsSL --compressed -o "$RAWMETA.tmp" "$SRC/metadata.json" && mv "$RAWMETA.tmp" "$RAWMETA"
+curl -fsSL --compressed --retry-all-errors -o "$RAWMETA.tmp" "$SRC/metadata.json" && mv "$RAWMETA.tmp" "$RAWMETA"
 NEW="$DATA/v$(date +%Y%m%d-%H%M%S)"
 mv "$STG" "$NEW"
 ln -s "$NEW" "$BASE/data-link" && mv -Tf "$BASE/data-link" "$CUR"
