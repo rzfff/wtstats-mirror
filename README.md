@@ -11,11 +11,11 @@
 | 路径 | 内容 |
 |---|---|
 | `dist/` | 线上部署成品全量快照(index.html 注入层 + dist/bundle.js 补丁版 + config/img/wasm,含 nginx 预压 .gz/.br) |
-| `patches/` | 补丁工具链:`patch-frontend.mjs`(26 处补丁,每处强制恰命中 1 次+语法关卡)、`verify-patch.mjs`(57 项断言)、`bisect-patch.mjs`、`check-live6.mjs`(线上验证)、`patch-table.json`(补丁底稿) |
+| `patches/` | 补丁工具链:`patch-frontend.mjs`(28 处补丁,每处强制恰命中 1 次+语法关卡)、`verify-patch.mjs`(65 项断言)、`bisect-patch.mjs`、`check-live7.mjs`(线上验证)、`patch-table.json`(补丁底稿) |
 | `update.sh` | 数据同步脚本:每日检查上游数据仓(每 3 天一版),裁剪(近 90 天+月度采样)+ 组装全量层 + gzip/brotli 双预压 + 原子换版 |
 | `LICENSE` | AGPL-3.0 全文(上游) |
 
-数据文件(约 1GB/版,770 期 CSV)不入库——由 `update.sh` 随时从上游全量重拉,不需要备份。
+数据文件(约 1GB/版,~790 期 CSV,随上游每 3 天增长)不入库——由 `update.sh` 随时从上游全量重拉,不需要备份。
 
 ## 主要修改(相对上游)
 
