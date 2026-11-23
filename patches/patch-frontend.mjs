@@ -417,4 +417,4 @@ console.log("              scp patched/bundle.js → /opt/services/wtstats/dist/
 console.log("              ⚠ 两个文件传完都必须 rm+重压自己的 .gz/.br(index 的在 dist/,bundle 的在 dist/dist/)——");
 console.log("                gzip_static/brotli_static 优先伺服预压缩副本,漏压=浏览器拿旧页而裸 curl 验证不出(第 11 轮事故):");
 console.log("                rm -f index.html.gz index.html.br && gzip -k -9 index.html && brotli -q 10 -k index.html");
-console.log("              线上验证用 bun check-live6.mjs(内部 curl --compressed,专防此类坑)");
+console.log("              线上验证用 bun check-live7.mjs(内部 curl --compressed,专防此类坑)");

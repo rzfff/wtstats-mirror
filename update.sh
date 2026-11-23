@@ -91,12 +91,12 @@ for e in meta:
     f = os.path.join(stg, "joined", e["date"] + ".csv")
     if not os.path.exists(f):
         subprocess.run(["curl", "-fsSL", "--compressed", "--retry", "3",
-                        "--retry-delay", "5", "-o", f, f"{src}/joined/{e['date']}.csv"],
+                        "--retry-delay", "5", "--retry-all-errors", "-o", f, f"{src}/joined/{e['date']}.csv"],
                        check=True)
         n += 1
 last = max(e["date"] for e in meta if e.get("type") == "joined")
 sz = os.path.getsize(os.path.join(stg, "joined", last + ".csv"))
-assert sz > 10000, f"最新 joined {last} 仅 $sz 字节,可疑"
+assert sz > 10000, f"最新 joined {last} 仅 {sz} 字节,可疑"
 print(f"joined 本次新拉 {n} 个;最新期 {last}({sz}B)校验通过")
 PYEOF
 
@@ -166,7 +166,7 @@ echo "预压缩完成:$(find "$STG" -name '*.gz' | wc -l) 个 .gz / $(find "$STG
 cp -al "$STG/joined" "$STG/full/joined"
 
 # 8) 记录原始 metadata(供下轮比对;放最后写,失败中断则不会误记"已处理")+ 原子换版 + 只留 2 版
-curl -fsSL --compressed --retry-all-errors -o "$RAWMETA.tmp" "$SRC/metadata.json" && mv "$RAWMETA.tmp" "$RAWMETA"
+curl -fsSL --compressed --retry 3 --retry-delay 5 --retry-all-errors --max-time 60 -o "$RAWMETA.tmp" "$SRC/metadata.json" && mv "$RAWMETA.tmp" "$RAWMETA"
 NEW="$DATA/v$(date +%Y%m%d-%H%M%S)"
 mv "$STG" "$NEW"
 ln -s "$NEW" "$BASE/data-link" && mv -Tf "$BASE/data-link" "$CUR"
