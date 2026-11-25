@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-# wtstats 数据同步脚本 v4.2(服务器 /opt/services/wtstats/update.sh)
+# wtstats 数据同步脚本 v4.3(服务器 /opt/services/wtstats/update.sh)
 # 上游:ControlNet/wt-data-project.data(GitHub,每 3 天推送一期)
 # 拉取源:https://controlnet.space/wt-data-project.data —— 实为 GitHub Pages
 #         后端(Fastly CDN),即官方线上前端在用的同一份数据
@@ -13,6 +13,8 @@
 #     joined/(硬链接共享,近零磁盘),供前端「全部数据」按钮切换(/wtstats/data/full/)
 #   想恢复全量为默认:删掉本脚本"数据裁剪"一步,删 data/ 重新跑。
 #   想调整窗口:改第 6 步的 timedelta(days=90)。
+# v4.3 变更(2026-11-25 第95轮):换版前加磁盘余量预检——余量 < 1.5G 则放弃本次(保留旧版,下轮自动重试);
+#   阈值改第 2b 步的 MIN_KB。背景:本机 19G 盘曾数次在换版中继期冲到 92-93%。
 #
 # 机制:cron 每日 04:37;metadata-upstream.json(原始版)逐字节相同 → 秒退;
 #       有更新 → 拉 9 个 ranks(原始)→ 组装 full/ → 校验 → 裁剪 → 双预压 → 原子换版。
@@ -50,6 +52,15 @@ rm -f "$STG/metadata.json"
 curl -fsSL --compressed --retry 3 --retry-delay 5 --retry-all-errors -o "$STG/metadata.json" "$SRC/metadata.json"
 if [ -f "$RAWMETA" ] && cmp -s "$STG/metadata.json" "$RAWMETA"; then
     echo "无更新"
+    exit 0
+fi
+
+# 2b) 磁盘余量预检(v4.3,2026-11-25):一期真实新增约 700M(含 full/ 层与双预压副本),
+#     余量不足则本次放弃——保留旧版,下轮自动重试;放在「无更新秒退」之后,日常无更新路径零影响
+MIN_KB=$((1500 * 1024))
+AVAIL_KB=$(df -Pk "$DATA" | awk 'NR==2 {print $4}')
+if [ "$AVAIL_KB" -lt "$MIN_KB" ]; then
+    echo "磁盘余量不足,放弃本次更新:剩余 $((AVAIL_KB / 1024))M < $((MIN_KB / 1024))M(每版真实新增约 700M;清理磁盘后下轮自动重试)"
     exit 0
 fi
 
